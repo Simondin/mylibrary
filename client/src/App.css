@@ -1,0 +1,41 @@
+.App {
+  text-align: center;
+  width: 600px;
+  margin: 8px;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.Locations {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.LocationsContainer {
+  overflow: auto;
+  height: 270px;
+  margin: 16px;
+  border: 1px solid;
+}
+
+.Location {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid;
+  margin: 8px;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.Location > * {
+  margin-bottom: 8px;
+}
+
+.AddressInfo {
+  display: flex;
+}

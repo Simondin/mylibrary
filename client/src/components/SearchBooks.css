@@ -1,0 +1,38 @@
+.SearchBooks {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    width: 500px;
+}
+
+.BookPreview {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #dedede;
+}
+
+.BookPreview .Cover {
+    height: 75px;
+    width: 50px;
+}
+
+.BookPreview .CoverContainer {
+    margin-right: 8px;
+}
+
+.BookPreview .DetailsContainer {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.BookPreview .DetailsContainer span{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.BookPreview .DetailsContainer span:first-of-type {
+    font-weight: bold;
+}
