@@ -1,5 +1,21 @@
 import { useEffect, useState } from 'react'
 import useDebounce from './useDebounce'
+import useQuery from './useQuery'
+
+function prepareURL(query, page, limit) {
+    const data = {
+        all: query,
+        page,
+        limit
+    }
+    const url = new URL("http://localhost:3000/api/books")
+    for (const it in data ) {
+        url.searchParams.append(it, data[it])
+    }
+
+    return url.toString()
+}
+
 
 /**
  * Custom hook to query the books
@@ -9,72 +25,54 @@ import useDebounce from './useDebounce'
  * @returns
  */
 export default function useQueryBooks(query, page=1, limit=20) {
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(void undefined)
     const [books, setBooks] = useState([])
     const [hasMore, setHasMore] = useState(false)
     const [booksFound, setBooksFound] = useState(0)
+    const [url, setUrl] = useState('')
 
     const deboucedQuery = useDebounce(query, 500)
+    const { data, loading, error } = useQuery(url)
 
     function resetState () {
         setBooks([])
-        setLoading(false)
         setBooksFound(0)
         setHasMore(false)
-        setError(void undefined)
+        setUrl('')
     }
 
     useEffect(() => {
-        async function getBooks(query, page, limit) {
-            if (! query) {
-                return {}
-            }
-
-            const data = {
-                title: query,
-                page,
-                limit
-            }
-            const url = new URL("http://localhost:3000/api/books")
-            for (const it in data ) {
-                url.searchParams.append(it, data[it])
-            }
-            const result = await fetch(url)
-
-            return result.json()
+        if (loading || ! data) {
+            return
         }
 
-        setLoading(true)
-        setError(void undefined)
-        async function fetchBooks () {
-            if (! deboucedQuery) {
-                resetState()
-                return
+        setBooks((prevBooks) => {
+            // To avoid double rendering with strict mode
+            switch (true) {
+                case ! data.books:
+                case prevBooks.length === data.books.length && page === 0:
+                    return prevBooks
+                default:
+                    return [
+                        ...(page !== 1
+                            ? prevBooks
+                            : []),
+                        ...data.books
+                    ]
             }
+        })
+        setBooksFound(data.num_found || 0)
+        setHasMore(data.books?.length > 0 || false)
+    }, [data])
 
-            const data = await getBooks(query, page, limit)
-            setBooks((prevBooks) => {
-                // To avoid double rendering with strict mode
-                switch (true) {
-                    case ! data.books:
-                    case prevBooks.length === data.books.length && page === 0:
-                        return prevBooks
-                    default:
-                        return [
-                            ...prevBooks,
-                            ...data.books,
-                        ]
-                }
-            })
-            setBooksFound(data.num_found || 0)
-            setHasMore(data.books?.length > 0 || false)
+    useEffect(() => {
+        if (! deboucedQuery) {
+            resetState()
+            return
         }
 
-        fetchBooks()
-            .catch(e => setError(e))
-            .finally(() => setLoading(false))
-    }, [deboucedQuery, page])
+        const queryURL = prepareURL(deboucedQuery, page, limit)
+        setUrl(queryURL)
+    }, [deboucedQuery, page, limit])
 
     return {
         books,

@@ -1,12 +1,28 @@
 import './App.css'
 
-import React, { useState } from 'react'
-import SearchBooks from './components/SearchBooks'
+import React from 'react'
 
-export default function App() {
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+} from 'react-router-dom'
+
+import SearchBooks from './components/SearchBooks'
+import BookDetails from './components/BookDetails'
+
+const App = () => {
     return (
-        <>
-            <SearchBooks />
-        </>
+        <div className='App'>
+            <Routes>
+                <Route
+                    exact path="/"
+                    element={<SearchBooks />}
+                />
+                <Route path="/book/:bookId" element={<BookDetails />} />
+            </Routes>
+        </div>
     )
 }
+
+export default App
