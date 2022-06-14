@@ -3,9 +3,10 @@ import fetch from 'node-fetch'
 
 const OPEN_LIBRARY_URL = process.env.OPEN_LIBRARY_URL || 'http://openlibrary.org'
 const OPEN_LIBRARY_COVERS_URL = process.env.OPEN_LIBRARY_COVER_URL || 'https://covers.openlibrary.org'
+const OPEN_LIBRARY_BLANK_COVER_URL = process.env.OPEN_LIBRARY_BLANK_COVER_URL || 'https://openlibrary.org/images/icons/avatar_book-sm.png'
 
-const DETAILS_COVER_SIZE = 'M'
-const LIST_COVER_SIZE = 'S'
+const DETAILS_COVER_SIZE = 'L'
+const LIST_COVER_SIZE = 'M'
 
 /**
  * Returns all the owned books.
@@ -60,17 +61,21 @@ async function getBooks(req, res) {
 		const url = `${OPEN_LIBRARY_URL}/search.json?${queryParams.toString()}`
 		const response = await fetch(url)
 		const results = await response.json()
-		const booksFounded = {
-			numFound: results.numFound,
-			books: results.docs.map(it => ({
+		// Filter out all books without cover id and ISBN array
+		const books = results.docs
+			// .filter(it => it.cover_i && it.isbn && it.author_name)
+			.map(it => ({
 				id: it.key.replace('/works/',''),
-				author: it.author_name,
+				author: it.author_name || 'Unknown author',
 				cover: getCoverURL(it.cover_i, LIST_COVER_SIZE),
 				title: it.title,
 			}))
-		}
 
-		res.json(booksFounded)
+		res.json({
+			...results,
+			num_found: results.num_found,
+			books
+		})
 	} catch (error){
 		res.status(500).json({type: 'error', message: error.message})
 	}
@@ -95,7 +100,9 @@ async function getBook(req, res) {
 }
 
 function getCoverURL(coverID, size) {
-	return `${OPEN_LIBRARY_COVERS_URL}/b/id/${coverID}-${size}.jpg`
+	return coverID
+		? `${OPEN_LIBRARY_COVERS_URL}/b/id/${coverID}-${size}.jpg`
+		: OPEN_LIBRARY_BLANK_COVER_URL
 }
 
 export {
