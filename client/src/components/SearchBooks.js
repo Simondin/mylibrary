@@ -5,8 +5,9 @@ import useQueryBooks from '../hooks/useQueryBooks'
 import useIntersect from '../hooks/useIntersect'
 
 export default function SearchBooks() {
+    const [query, setQuery] = useState('')
     const [page, setPage] = useState(1)
-    const [query, setQuery] = useState()
+    const [limit, setLimit] = useState(20)
 
     const {
         books,
@@ -14,7 +15,7 @@ export default function SearchBooks() {
         loading,
         error,
         booksFound,
-    } = useQueryBooks(query, page)
+    } = useQueryBooks(query, page, limit)
 
     const { setElement, setOptions, isIntersecting } = useIntersect()
 
@@ -34,7 +35,9 @@ export default function SearchBooks() {
                     <img className='Cover' src={cover}></img>
                 </div>
                 <div className='DetailsContainer'>
-                    <span>{title}</span>
+                    <a href={`/book/${id}`}>
+                        <span>{title}</span>
+                    </a>
                     <span>{`by: ${author}`}</span>
                 </div>
             </div>
@@ -56,16 +59,16 @@ export default function SearchBooks() {
     }, [isIntersecting])
 
     return (
-        <>
-            <input type='text' onChange={onSearch}></input>
+        <div className='SearchBooks'>
+            <input type='text' onChange={onSearch} value={query}></input>
             <div className='Header'>
                 <span>{`Books (${books.length} / ${booksFound})`}</span>
             </div>
-            <div className='SearchBooks'>
+            <div className='SearchBooksContainer'>
                 { error && <span>{error.message}</span> }
-                {books.map(booksMap)}
+                { books.map(booksMap) }
                 { loading && <span>Loading...</span> }
             </div>
-        </>
+        </div>
     )
 }

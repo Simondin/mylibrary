@@ -64,16 +64,21 @@ async function getBooks(req, res) {
 		// Filter out all books without cover id and ISBN array
 		const books = results.docs
 			// .filter(it => it.cover_i && it.isbn && it.author_name)
-			.map(it => ({
-				id: it.key.replace('/works/',''),
-				author: it.author_name || 'Unknown author',
-				cover: getCoverURL(it.cover_i, LIST_COVER_SIZE),
-				title: it.title,
-			}))
+			.map(it => {
+				const res = {
+					id: it.cover_edition_key || it.edition_key[0] || '',
+					author: it.author_name || 'Unknown author',
+					cover: getCoverURL(it.cover_i, LIST_COVER_SIZE),
+					title: it.title,
+				}
+
+				return res
+			})
 
 		res.json({
 			...results,
 			num_found: results.num_found,
+			page,
 			books
 		})
 	} catch (error){
@@ -87,12 +92,23 @@ async function getBook(req, res) {
 	const { id } = params
 
 	try{
-		const url = `${OPEN_LIBRARY_URL}/works/${id}.json`
+		const url = `${OPEN_LIBRARY_URL}/api/books?bibkeys=OLID:${id}&jscmd=details&format=json`
 		const response = await fetch(url)
 		const book = await response.json()
-		res.send({
-			...book,
-			covers: book.covers.map(it => getCoverURL(it, DETAILS_COVER_SIZE))
+		const { bib_key, details, thumbnail_url } = book[`OLID:${id}`]
+
+		res.json({
+			bib_key,
+			...{
+				...details,
+				authors: details.authors ||  [{ name:'Unknown author' }],
+				cover: thumbnail_url && {
+					small: thumbnail_url,
+					medium: thumbnail_url.replace('-S', '-M'),
+					large: thumbnail_url.replace('-S', '-L'),
+				},
+				languages: details.languages?.[0].key.replace('/languages/','')
+			}
 		})
 	} catch (error){
 		res.status(500).json({type: 'error', message: error.message})
