@@ -1,27 +1,29 @@
-import './App.css'
+import "./App.css"
 
-import React from 'react'
+import React from "react"
 
 import {
-    BrowserRouter,
     Routes,
     Route,
-} from 'react-router-dom'
+} from "react-router-dom"
+import { Grommet, Box } from "grommet"
 
-import SearchBooks from './components/SearchBooks'
-import BookDetails from './components/BookDetails'
+import SearchBooks from "./components/SearchBooks"
+import BookDetails from "./components/BookDetails"
 
 const App = () => {
     return (
-        <div className='App'>
-            <Routes>
-                <Route
-                    exact path="/"
-                    element={<SearchBooks />}
-                />
-                <Route path="/book/:bookId" element={<BookDetails />} />
-            </Routes>
-        </div>
+        <Grommet className="App" full>
+            <Box fill>
+                <Routes>
+                    <Route
+                        exact path="/"
+                        element={<SearchBooks />}
+                    />
+                    <Route path="/book/:bookId" element={<BookDetails />} />
+                </Routes>
+            </Box>
+        </Grommet>
     )
 }
 

@@ -1,8 +1,8 @@
-import path from 'path'
-import { Low, JSONFile } from 'lowdb'
+import path from "path"
+import { Low, JSONFile } from "lowdb"
 
 // Use JSON file for storage
-const relativePath = path.relative(process.cwd(), 'data/db.json')
+const relativePath = path.relative(process.cwd(), "data/db.json")
 const adapter = new JSONFile(relativePath)
 
 const db = new Low(adapter)

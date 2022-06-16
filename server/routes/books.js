@@ -1,12 +1,13 @@
 // Define here all the books API
-import fetch from 'node-fetch'
+import fetch from "node-fetch"
 
-const OPEN_LIBRARY_URL = process.env.OPEN_LIBRARY_URL || 'http://openlibrary.org'
-const OPEN_LIBRARY_COVERS_URL = process.env.OPEN_LIBRARY_COVER_URL || 'https://covers.openlibrary.org'
-const OPEN_LIBRARY_BLANK_COVER_URL = process.env.OPEN_LIBRARY_BLANK_COVER_URL || 'https://openlibrary.org/images/icons/avatar_book-sm.png'
+const OPEN_LIBRARY_URL = process.env.OPEN_LIBRARY_URL || "http://openlibrary.org"
+const OPEN_LIBRARY_COVERS_URL = process.env.OPEN_LIBRARY_COVER_URL || "https://covers.openlibrary.org"
+const OPEN_LIBRARY_BLANK_COVER_URL = process.env.OPEN_LIBRARY_BLANK_COVER_URL || "https://openlibrary.org/images/icons/avatar_book-sm.png"
 
-const DETAILS_COVER_SIZE = 'L'
-const LIST_COVER_SIZE = 'M'
+const SMALL_COVER_SIZE = "S"
+const MEDIUM_COVER_SIZE = "M"
+const LARGE_COVER_SIZE = "L"
 
 /**
  * Returns all the owned books.
@@ -66,10 +67,13 @@ async function getBooks(req, res) {
 			// .filter(it => it.cover_i && it.isbn && it.author_name)
 			.map(it => {
 				const res = {
-					id: it.cover_edition_key || it.edition_key[0] || '',
-					author: it.author_name || 'Unknown author',
-					cover: getCoverURL(it.cover_i, LIST_COVER_SIZE),
+					id: it.cover_edition_key || it.edition_key?.[0] || it.key.replace("/works/",""),
+					author: it.author_name || "Unknown author",
+					cover: getCoverURL(it.cover_i, MEDIUM_COVER_SIZE),
 					title: it.title,
+					type: (it.cover_edition_key || it.edition_key?.[0])
+						? "book"
+						: "work"
 				}
 
 				return res
@@ -82,43 +86,70 @@ async function getBooks(req, res) {
 			books
 		})
 	} catch (error){
-		res.status(500).json({type: 'error', message: error.message})
+		res.status(500).json({type: "error", message: error.message})
 	}
 }
 
 async function getBook(req, res) {
-	const { params } = req
+	const { params, query, service: db } = req
 
 	const { id } = params
+	const { type } = query
+
+	const isBook = ! type || type === "book"
 
 	try{
-		const url = `${OPEN_LIBRARY_URL}/api/books?bibkeys=OLID:${id}&jscmd=details&format=json`
+		const url = isBook
+			? `${OPEN_LIBRARY_URL}/api/books?bibkeys=OLID:${id}&jscmd=details&format=json`
+			: `${OPEN_LIBRARY_URL}/works/${id}.json`
 		const response = await fetch(url)
-		const book = await response.json()
-		const { details, thumbnail_url } = book[`OLID:${id}`]
-
-		const { service: db } = req
+		const data = await response.json()
 
 		const result = {
 			id,
-			data: {
-				...details,
-				authors: details.authors ||  [{ name:'Unknown author' }],
-				cover: thumbnail_url && {
-					small: thumbnail_url,
-					medium: thumbnail_url.replace('-S', '-M'),
-					large: thumbnail_url.replace('-S', '-L'),
-				},
-				languages: details.languages?.[0].key.replace('/languages/','')
-			},
 			owned: db.data.books?.[id]?.owned || false,
 			read:db.data.books?.[id]?.read || false,
+			data: isBook
+				? parseBookData(data, id)
+				: parseWorkData(data, id)
 		}
+
 
 		res.json(result)
 	} catch (error){
-		res.status(500).json({type: 'error', message: error.message})
+		res.status(500).json({type: "error", message: error.message})
 	}
+}
+
+function parseBookData(book, id) {
+	const { details, thumbnail_url } = book[`OLID:${id}`]
+
+	const data = {
+			...details,
+			authors: details.authors ||  [{ name:"Unknown author" }],
+			cover: thumbnail_url && {
+				small: thumbnail_url,
+				medium: thumbnail_url.replace("-S", "-M"),
+				large: thumbnail_url.replace("-S", "-L"),
+			},
+			languages: details.languages?.[0].key.replace("/languages/","")
+	}
+
+	return data
+}
+
+function parseWorkData(work) {
+	const data = {
+		title: work.title,
+		// subtitle: work.subtitle,
+		cover: work.covers && {
+			small: getCoverURL(work.covers?.[0], SMALL_COVER_SIZE),
+			medium: getCoverURL(work.covers?.[0], MEDIUM_COVER_SIZE),
+			large: getCoverURL(work.covers?.[0], LARGE_COVER_SIZE),
+		},
+	}
+
+	return data
 }
 
 async function ownBook(req, res) {
@@ -180,8 +211,12 @@ async function readBook(req, res) {
 }
 
 function getCoverURL(coverID, size) {
+	const coverSize = size
+		? `-${size}`
+		: ""
+
 	return coverID
-		? `${OPEN_LIBRARY_COVERS_URL}/b/id/${coverID}-${size}.jpg`
+		? `${OPEN_LIBRARY_COVERS_URL}/b/id/${coverID}${coverSize}.jpg`
 		: OPEN_LIBRARY_BLANK_COVER_URL
 }
 

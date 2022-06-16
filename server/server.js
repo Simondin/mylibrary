@@ -1,9 +1,9 @@
-import express from 'express'
-import bodyParser from 'body-parser'
-import compression from 'compression'
+import express from "express"
+import bodyParser from "body-parser"
+import compression from "compression"
 
-import db from './services/db.js'
-import { routes } from './routes/routes.js'
+import db from "./services/db.js"
+import { routes } from "./routes/routes.js"
 
 const setDbServices = (req, res, next) => {
     req.service = db
@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(compression())
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*')
+    res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT")
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
     next()
@@ -29,10 +29,10 @@ app.use((req, res, next) => {
 
 app.listen(PORT, () => console.log(`App listening on :${PORT}`))
 
-app.get('/', async (req, res, next) => {
+app.get("/", async (req, res, next) => {
     res.status(200).send(new Date())
 })
 
-app.use('/api', setDbServices, routes)
+app.use("/api", setDbServices, routes)
 
 export default app

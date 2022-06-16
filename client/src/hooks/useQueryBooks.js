@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import useDebounce from './useDebounce'
-import useQuery from './useQuery'
+import { useEffect, useState } from "react"
+import useDebounce from "./useDebounce"
+import useQuery from "./useQuery"
 
 function prepareURL(query, page, limit) {
     const data = {
@@ -25,19 +25,19 @@ function prepareURL(query, page, limit) {
  * @returns
  */
 export default function useQueryBooks(query, page=1, limit=20) {
-    const [books, setBooks] = useState([])
+    const [books, setBooks] = useState()
     const [hasMore, setHasMore] = useState(false)
     const [booksFound, setBooksFound] = useState(0)
-    const [url, setUrl] = useState('')
+    const [url, setUrl] = useState("")
 
     const deboucedQuery = useDebounce(query, 500)
     const { data, loading, error } = useQuery(url)
 
     function resetState () {
-        setBooks([])
+        setBooks()
         setBooksFound(0)
         setHasMore(false)
-        setUrl('')
+        setUrl("")
     }
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export default function useQueryBooks(query, page=1, limit=20) {
             // To avoid double rendering with strict mode
             switch (true) {
                 case ! data.books:
-                case prevBooks.length === data.books.length && page === 0:
+                case prevBooks?.length === data.books?.length && page === 0:
                     return prevBooks
                 default:
                     return [

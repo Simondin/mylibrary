@@ -9,8 +9,6 @@
 .BookPreview {
     display: flex;
     flex-direction: row;
-    margin-bottom: 8px;
-    border-bottom: 1px solid #dedede;
 }
 
 .BookPreview .Cover {
@@ -32,8 +30,4 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.BookPreview .DetailsContainer span:first-of-type {
-    font-weight: bold;
 }
