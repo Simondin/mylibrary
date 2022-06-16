@@ -95,11 +95,13 @@ async function getBook(req, res) {
 		const url = `${OPEN_LIBRARY_URL}/api/books?bibkeys=OLID:${id}&jscmd=details&format=json`
 		const response = await fetch(url)
 		const book = await response.json()
-		const { bib_key, details, thumbnail_url } = book[`OLID:${id}`]
+		const { details, thumbnail_url } = book[`OLID:${id}`]
 
-		res.json({
-			bib_key,
-			...{
+		const { service: db } = req
+
+		const result = {
+			id,
+			data: {
 				...details,
 				authors: details.authors ||  [{ name:'Unknown author' }],
 				cover: thumbnail_url && {
@@ -108,11 +110,73 @@ async function getBook(req, res) {
 					large: thumbnail_url.replace('-S', '-L'),
 				},
 				languages: details.languages?.[0].key.replace('/languages/','')
-			}
-		})
+			},
+			owned: db.data.books?.[id]?.owned || false,
+			read:db.data.books?.[id]?.read || false,
+		}
+
+		res.json(result)
 	} catch (error){
 		res.status(500).json({type: 'error', message: error.message})
 	}
+}
+
+async function ownBook(req, res) {
+	const { body, service: db } = req
+
+	const { id, book, owned } = body
+
+	if (! id || ! book) {
+		res.sendStatus(500)
+		return
+	}
+
+	const { books } = db.data
+
+	switch (true) {
+		case (id in books): // Set book as owned
+			books[id].owned = owned
+			break
+		case (!(id in books) && owned): // Add owned book
+			books[id] = {
+				data: book,
+				owned
+			}
+			break
+	}
+
+	await db.write()
+
+	res.json(owned)
+}
+
+async function readBook(req, res) {
+	const { body, service: db } = req
+
+	const { id, book, read } = body
+
+	if (! id || ! book) {
+		res.sendStatus(500)
+		return
+	}
+
+	const { books } = db.data
+
+	switch (true) {
+		case (id in books): // Set book as owned
+			books[id].read = read
+			break
+		case (!(id in books) && read): // Add owned book
+			books[id] = {
+				data: book,
+				read
+			}
+			break
+	}
+
+	await db.write()
+
+	res.json(read)
 }
 
 function getCoverURL(coverID, size) {
@@ -126,4 +190,6 @@ export {
 	getBooks,
 	getOwnedBooks,
 	getReadBooks,
+	ownBook,
+	readBook,
 }
