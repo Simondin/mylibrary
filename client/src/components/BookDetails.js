@@ -1,25 +1,54 @@
-import './BookDetails.css'
+import "./BookDetails.css"
 
-import React, { useState, useEffect } from 'react'
-import useQuery from '../hooks/useQuery'
+import React, { useState, useEffect } from "react"
+import useQuery from "../hooks/useQuery"
 
-import { useParams, useNavigate } from 'react-router-dom'
+import {
+    useParams,
+    useSearchParams,
+    useNavigate,
+} from "react-router-dom"
+
+import {
+    Box,
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    Footer,
+    Image,
+    Nav,
+    Spinner,
+    Text,
+} from "grommet"
+
+import {
+    Add as AddIcon,
+    Book as BookIcon,
+    Erase as EraseIcon,
+    Catalog as CatalogIcon,
+    FormPreviousLink as BackIcon,
+} from "grommet-icons"
 
 export default function BookDetails() {
     const [isBookOwned, setIsBookOwned ] = useState(false)
     const [isBookRead, setIsBookRead ] = useState(false)
     const { bookId } = useParams()
+    const [searchParams] = useSearchParams()
+
+    const type = searchParams.get("type")
     const navigate = useNavigate()
 
-    const { data: book, loading: bookLoading, error: bookError } = useQuery(`http://localhost:3000/api/book/${bookId}`)
+    const typeParam = type ? `?type=${type}` : ""
+    const { data: book, loading: bookLoading, error: bookError } = useQuery(`http://localhost:3000/api/book/${bookId}${typeParam}`)
 
     const queryOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
+        method: "POST",
+        headers: {"Content-Type": "application/json"}
     }
 
     const { data: isOwned, loading: ownLoading, error: ownError, refetch: ownRefetch } = useQuery(
-        'http://localhost:3000/api/book/own/',
+        "http://localhost:3000/api/book/own/",
         {
             ...queryOptions,
             body: JSON.stringify({
@@ -32,7 +61,7 @@ export default function BookDetails() {
     )
 
     const { data: isRead, loading: readLoading, error: readError, refetch: readRefetch } = useQuery(
-        'http://localhost:3000/api/book/read/',
+        "http://localhost:3000/api/book/read/",
         {
             ...queryOptions,
             body: JSON.stringify({
@@ -46,7 +75,7 @@ export default function BookDetails() {
 
     useEffect(() => {
         if (! bookId) {
-            navigate('/');
+            navigate("/");
         }
     }, [bookId])
 
@@ -70,58 +99,114 @@ export default function BookDetails() {
 
     function bookDetails( book ) {
         const { data } = book
+
+        const authorValue = data.by_statement
+            ? data.by_statement.replace(/(\s;)/g,",")
+            : (data.authors && data.authors.length)
+                ? `by ${data.authors[0].name}`
+                : ""
+
+
         return (
-            <div className='BookDetailsContainer'>
-                <div className='BookDetailsDataContainer'>
-                    <img
-                        className='BookDetailsCover'
-                        src={data.cover?.medium || 'https://openlibrary.org/images/icons/avatar_book.png'}
-                    />
-                    <div className='BookDetailsData'>
-                        <span>{data.title}</span>
-                        <span>{data.edition_name && data.edition_name}</span>
-                        <span>{data.by_statement?.replace(/(\s;)/g,',') || `by ${data.authors?.[0].name}` || ''}</span>
-                        <span>{data.number_of_pages && `Pages: ${data.number_of_pages}`}</span>
-                        <span>{data.publish_date && `Publish Date: ${data.publish_date}`}</span>
-                        <span>{data.languages && `Language: ${data.languages}`}</span>
-                    </div>
-                </div>
-                <div className='BookdDetailsActions'>
-                    <button
+            <Box
+                fill
+                align="center"
+                margin={{top: "medium"}}
+            >
+                <Card
+                    width="medium"
+                    background="light-1"
+                    direction="column"
+                    align="center"
+
+                >
+                    <CardBody
+                        pad="medium"
+                        gap="small"
+                    >
+                        <Box align="center">
+                            <Text>{data.title}</Text>
+                            {data.subtitle ? <Text size="small">{data.subtitle}</Text>:""}
+                            <Text>{authorValue}</Text>
+                            {data.edition_name && <Text size="small">{data.edition_name}</Text>}
+                        </Box>
+                        <Box
+                            direction="row"
+                            gap="small"
+                        >
+                            <Image
+                                fallback="https://openlibrary.org/images/icons/avatar_book.png"
+                                fit="contain"
+                                src={data.cover?.medium || "https://openlibrary.org/images/icons/avatar_book.png"}
+                            />
+                            <Box>
+                                <Text size="small">{data.number_of_pages && `Pages: ${data.number_of_pages}`}</Text>
+                                <Text size="small">{data.publish_date && `Publish Date: ${data.publish_date}`}</Text>
+                                <Text size="small">{data.languages && `Language: ${data.languages}`}</Text>
+                            </Box>
+                        </Box>
+                    </CardBody>
+                    <CardFooter pad={{vertical: "small"}}>
+                    <Button
+                        icon={isBookOwned ? <EraseIcon /> : <AddIcon />}
+                        hoverIndicator
+                        color="neutral-1"
+                        primary={isBookOwned}
                         onClick={ownRefetch}
                         disabled={ownLoading}
-                    >
-                        {
+                        label={
                             isBookOwned
-                                ? 'Remove from shelf'
-                                : 'Add on shelf'
+                                ? "Remove"
+                                : "Add"
                         }
-                    </button>
-                    <button
+                    />
+                    <Button
+                        icon={<BookIcon />}
+                        color="neutral-4"
+                        primary={isBookRead}
                         onClick={readRefetch}
-                        disabled={readLoading}
-                    >
-                        {
+                        disabled={ownLoading}
+                        label={
                             isBookRead
-                                ? 'Mark as not read'
-                                : 'Mark as read'
+                                ? "No read"
+                                : "Read"
                         }
-                    </button>
-                </div>
-            </div>
+                    />
+
+                    </CardFooter>
+                </Card>
+            </Box>
         )
     }
 
     return (
         <>
-            {
-                (bookLoading || ownLoading || readLoading) && 'Loading...'
-            }
-            {
-                (bookError || ownError || readError) && <span>{bookError}</span>
-            }
+            <Nav
+                direction="row"
+                background="light-3"
+                pad="xxsmall"
+                align="center"
+                justify="between"
+            >
+                <Box round="full" overflow="hidden">
+                    <Button hoverIndicator icon={<BackIcon />} onClick={() => navigate("/")}/>
+                </Box>
+                {
+                    (bookLoading || ownLoading || readLoading) && <Spinner size="small" />
+                }
+            </Nav>
             {
                 book && bookDetails(book)
+            }
+            {
+                (bookError || ownError || readError) &&
+                <Footer
+                    background="light-3"
+                    pad="small"
+                    align="center"
+                >
+                    <Text>{bookError || ownError || readError}</Text>
+                </Footer>
             }
         </>
     )
