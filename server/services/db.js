@@ -14,7 +14,7 @@ const init = async () => {
 
     if (! data || ! Object.keys(data).length) {
         db.data = {
-            books: []
+            books: {}
         }
 
         await db.write()

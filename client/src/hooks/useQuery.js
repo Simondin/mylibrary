@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from 'react'
  * @param {*} api The callback used to fetch data.
  * @returns
  */
-export default function useQuery(url) {
+export default function useQuery(url, options, manual=false) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(void undefined)
     const [data, setData] = useState()
@@ -18,20 +18,24 @@ export default function useQuery(url) {
         setLoading(true)
         setError(void undefined)
 
-        fetch(url)
+        fetch(url, options)
             .then(r => r.json())
             .then(d => setData(d))
             .catch(e => setError(e))
             .finally(() => setLoading(false))
-    }, [url])
+    }, [url, options])
 
     useEffect(() => {
-        callAPI()
+        if (! manual) {
+            callAPI()
+        }
+
     }, [callAPI])
 
     return {
         data,
         loading,
         error,
+        refetch: callAPI,
     }
 }

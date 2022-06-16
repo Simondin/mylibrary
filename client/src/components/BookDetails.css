@@ -1,13 +1,19 @@
 .BookDetailsContainer {
     display: flex;
+    flex-direction: column;
     padding: 12px;
+}
+
+.BookDetailsDataContainer {
+    display: flex;
+    margin-bottom: 12px;
 }
 
 .BookDetailsCover {
     margin-right: 16px;
 }
 
-.BookDetailsDataContainer {
+.BookDetailsData {
     display: flex;
     flex-direction: column;
 }
