@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+    app:
+        build:
+            context: ./client
+            args:
+                - REACT_APP_REST_API=${REACT_APP_REST_API}
+        ports:
+            - 8000:8000
+        restart: always
+    rest:
+        env_file:
+            - .env
+        build:
+            context: ./rest
+            args:
+                - REST_PORT=${REST_PORT}
+        ports:
+            - ${REST_PORT}:${REST_PORT}
+        restart: always

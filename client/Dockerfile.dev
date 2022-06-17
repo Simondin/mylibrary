@@ -1,0 +1,10 @@
+# build environment
+FROM node:18.3.0-alpine
+ADD . /code/client
+ENV PATH /code/node_modules/.bin:$PATH
+COPY package.json /code
+COPY package-lock.json /code
+RUN cd /code && npm i
+WORKDIR /code/client
+CMD ["npm", "run", "start"]
+EXPOSE 8000

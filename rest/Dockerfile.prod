@@ -1,0 +1,17 @@
+FROM node:18.3.0-alpine
+
+ARG REST_PORT
+
+WORKDIR /code
+ENV PATH /code/node_modules/.bin:$PATH
+
+COPY package.json ./
+COPY package-lock.json ./
+
+RUN npm i
+
+COPY . ./
+
+CMD ["npm", "start"]
+
+EXPOSE ${REST_PORT}

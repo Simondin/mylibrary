@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+    app:
+        build:
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./client:/code/client
+    rest:
+        build:
+            dockerfile: Dockerfile.dev
+        ports:
+            - '9229:9229'               # Chrome Debugger for Rest.
+        volumes:
+            - ./rest:/code/rest

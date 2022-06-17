@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import useDebounce from "./useDebounce"
 import useQuery from "./useQuery"
 
-const REST = process.env.REACT_APP_REST_API || "http://localhost:8000/api"
+const REST = process.env.REACT_APP_REST_API || "http://localhost:8080/api"
 
 function prepareURL(query, page, limit) {
     const data = {
