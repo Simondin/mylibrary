@@ -30,6 +30,8 @@ import {
     FormPreviousLink as BackIcon,
 } from "grommet-icons"
 
+const REST = process.env.REACT_APP_REST_API || "http://localhost:8000/api"
+
 export default function BookDetails() {
     const [isBookOwned, setIsBookOwned ] = useState(false)
     const [isBookRead, setIsBookRead ] = useState(false)
@@ -40,7 +42,7 @@ export default function BookDetails() {
     const navigate = useNavigate()
 
     const typeParam = type ? `?type=${type}` : ""
-    const { data: book, loading: bookLoading, error: bookError } = useQuery(`http://localhost:3000/api/book/${bookId}${typeParam}`)
+    const { data: book, loading: bookLoading, error: bookError } = useQuery(`${REST}/book/${bookId}${typeParam}`)
 
     const queryOptions = {
         method: "POST",
@@ -48,7 +50,7 @@ export default function BookDetails() {
     }
 
     const { data: isOwned, loading: ownLoading, error: ownError, refetch: ownRefetch } = useQuery(
-        "http://localhost:3000/api/book/own/",
+        `${REST}book/own/`,
         {
             ...queryOptions,
             body: JSON.stringify({
@@ -61,7 +63,7 @@ export default function BookDetails() {
     )
 
     const { data: isRead, loading: readLoading, error: readError, refetch: readRefetch } = useQuery(
-        "http://localhost:3000/api/book/read/",
+        `${REST}book/read/`,
         {
             ...queryOptions,
             body: JSON.stringify({
