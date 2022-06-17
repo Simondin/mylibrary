@@ -1,5 +1,6 @@
+# README
 
-## README
+## WITH DOCKER
 
 Prerequisites:
 
@@ -56,3 +57,26 @@ This runs and orchestrates all the project entities (client, rest, and proxy) an
 ### STOP AND REMOVE ALL CONTAINERS**
 
 `docker-compose -f docker-compose.yml -f docker-compose.pro.yml down --rmi all`
+
+
+## WITHOUT DOCKER
+
+### Client
+
+First install dependencies for the client project:
+
+`npm install`
+
+Then run the command:
+
+`yarn build && serve -p 8000 -s build`
+
+### Rest
+
+First install dependencies for the client project:
+
+`npm install`
+
+Then run the command:
+
+`yarn start`
