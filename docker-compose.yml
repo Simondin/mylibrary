@@ -18,3 +18,10 @@ services:
         ports:
             - ${REST_PORT}:${REST_PORT}
         restart: always
+    proxy:
+        build:
+            context: ./proxy
+            dockerfile: Dockerfile
+        ports:
+            - '80:80'
+        restart: always
