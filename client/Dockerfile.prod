@@ -1,0 +1,20 @@
+# build environment
+FROM node:18.3.0-alpine
+
+ARG REACT_APP_REST_API
+
+WORKDIR /code
+ENV PATH /code/node_modules/.bin:$PATH
+
+COPY package.json .
+
+RUN npm i
+
+COPY . ./
+
+RUN REACT_APP_REST_API=${REACT_APP_REST_API} \
+    npm run build
+
+CMD ["serve", "-p", "8000", "-s", "build"]
+
+EXPOSE 8000

@@ -12,7 +12,7 @@ const setDbServices = (req, res, next) => {
 
 const app = express()
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.REST_PORT || 8080
 // parse application/json
 app.use(bodyParser.json())
 // use compression
