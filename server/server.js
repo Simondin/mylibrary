@@ -15,14 +15,11 @@ const app = express()
 const PORT = process.env.PORT || 3001
 // parse application/json
 app.use(bodyParser.json())
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
 // use compression
 app.use(compression())
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT")
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
     next()
 })

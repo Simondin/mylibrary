@@ -11,7 +11,8 @@
       "node-fetch": "^3.2.5"
     },
     "scripts": {
-      "start": "nodemon -r dotenv/config --inspect server.js --ignore 'data/db.json'"
+      "dev": "nodemon -r dotenv/config --inspect server.js --ignore 'data/db.json'",
+      "start": "PORT=8080 node ./server.js"
     },
     "devDependencies": {
       "dotenv": "^16.0.1",

@@ -2,13 +2,15 @@ import { useEffect, useState } from "react"
 import useDebounce from "./useDebounce"
 import useQuery from "./useQuery"
 
+const REST = process.env.REACT_APP_REST_API || "http://localhost:8000/api"
+
 function prepareURL(query, page, limit) {
     const data = {
         all: query,
         page,
         limit
     }
-    const url = new URL("http://localhost:3000/api/books")
+    const url = new URL(`${REST}/books`)
     for (const it in data ) {
         url.searchParams.append(it, data[it])
     }
