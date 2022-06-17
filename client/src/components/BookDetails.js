@@ -50,7 +50,7 @@ export default function BookDetails() {
     }
 
     const { data: isOwned, loading: ownLoading, error: ownError, refetch: ownRefetch } = useQuery(
-        `${REST}book/own/`,
+        `${REST}/book/own/`,
         {
             ...queryOptions,
             body: JSON.stringify({
@@ -63,7 +63,7 @@ export default function BookDetails() {
     )
 
     const { data: isRead, loading: readLoading, error: readError, refetch: readRefetch } = useQuery(
-        `${REST}book/read/`,
+        `${REST}/book/read/`,
         {
             ...queryOptions,
             body: JSON.stringify({
