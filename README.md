@@ -1,6 +1,6 @@
-# README
+# My Library README
 
-## WITH DOCKER
+## RUN WITH DOCKER
 
 Prerequisites:
 
@@ -58,8 +58,7 @@ This runs and orchestrates all the project entities (client, rest, and proxy) an
 
 `docker-compose -f docker-compose.yml -f docker-compose.pro.yml down --rmi all`
 
-
-## WITHOUT DOCKER
+## RUN WITHOUT DOCKER
 
 ### Client
 
