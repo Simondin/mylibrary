@@ -26,10 +26,10 @@ app.use((req, res, next) => {
 
 app.listen(PORT, () => console.log(`App listening on :${PORT}`))
 
-app.get("/", async (req, res, next) => {
+app.get("/ping", async (req, res, next) => {
     res.status(200).send(new Date())
 })
 
-app.use("/api", setDbServices, routes)
+app.use("/", setDbServices, routes)
 
 export default app

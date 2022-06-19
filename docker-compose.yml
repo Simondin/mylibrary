@@ -4,19 +4,18 @@ services:
         build:
             context: ./client
             args:
-                - REACT_APP_REST_API=${REACT_APP_REST_API}
+                REACT_APP_REST_API: ${REACT_APP_REST_API:-/api}
         ports:
-            - 8000:8000
+            - '8000:8000'
         restart: always
     rest:
-        env_file:
-            - .env
         build:
             context: ./rest
             args:
-                - REST_PORT=${REST_PORT}
+                OPEN_LIBRARY_URL: ${OPEN_LIBRARY_URL-http://openlibrary.org}
+                OPEN_LIBRARY_COVER_URL: ${OPEN_LIBRARY_COVER_URL-https://covers.openlibrary.org}
         ports:
-            - ${REST_PORT}:${REST_PORT}
+            - '8080:8080'
         restart: always
     proxy:
         build:

@@ -10,12 +10,12 @@ function prepareURL(query, page, limit) {
         page,
         limit
     }
-    const url = new URL(`${REST}/books`)
+    const url = []
     for (const it in data ) {
-        url.searchParams.append(it, data[it])
+        url.push(`${encodeURIComponent(it)}=${encodeURIComponent(data[it])}`)
     }
 
-    return url.toString()
+    return `${REST}/books?` + url.join('&')
 }
 
 

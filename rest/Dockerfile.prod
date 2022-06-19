@@ -1,7 +1,5 @@
 FROM node:18.3.0-alpine
 
-ARG REST_PORT
-
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
 
@@ -14,4 +12,4 @@ COPY . ./
 
 CMD ["npm", "start"]
 
-EXPOSE ${REST_PORT}
+EXPOSE 8080

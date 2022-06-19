@@ -15,6 +15,7 @@ import {
     Card,
     CardBody,
     CardFooter,
+    CardHeader,
     Footer,
     Image,
     Nav,
@@ -117,30 +118,45 @@ export default function BookDetails() {
             >
                 <Card
                     width="medium"
+                    height="large"
                     background="light-1"
                     direction="column"
                     align="center"
 
                 >
-                    <CardBody
-                        pad="medium"
-                        gap="small"
+                    <CardHeader
+                        direction="column"
+                        pad={{
+                            horizontal: "medium",
+                            vertical: "small"
+                        }}
+                        gap="xxsmall"
                     >
-                        <Box align="center">
-                            <Text>{data.title}</Text>
-                            {data.subtitle ? <Text size="small">{data.subtitle}</Text>:""}
-                            <Text>{authorValue}</Text>
-                            {data.edition_name && <Text size="small">{data.edition_name}</Text>}
-                        </Box>
-                        <Box
-                            direction="row"
-                            gap="small"
-                        >
+                        <Text>{data.title}</Text>
+                        {data.subtitle ? <Text size="small">{data.subtitle}</Text>:""}
+                        <Text>{authorValue}</Text>
+                        {data.edition_name && <Text size="small">{data.edition_name}</Text>}
+                    </CardHeader>
+                    <CardBody
+                        pad={{
+                            horizontal: "medium",
+                        }}
+                        gap="small"
+                        fill
+                    >
+                        <Box align="center" fill>
                             <Image
                                 fallback="https://openlibrary.org/images/icons/avatar_book.png"
                                 fit="contain"
                                 src={data.cover?.medium || "https://openlibrary.org/images/icons/avatar_book.png"}
                             />
+                        </Box>
+                        <Box
+                            direction="row"
+                            gap="small"
+                            align="center"
+                            justify="center"
+                        >
                             <Box>
                                 <Text size="small">{data.number_of_pages && `Pages: ${data.number_of_pages}`}</Text>
                                 <Text size="small">{data.publish_date && `Publish Date: ${data.publish_date}`}</Text>

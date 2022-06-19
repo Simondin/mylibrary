@@ -1,5 +1,6 @@
 # build environment
 FROM node:18.3.0-alpine
+
 ADD . /code/client
 ENV PATH /code/node_modules/.bin:$PATH
 COPY package.json /code
